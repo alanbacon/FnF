@@ -9,7 +9,7 @@ import re
 
 ## Filenames class (and the PathStr class)
 
-from Abstracts import TypedList, ComparableMixin
+from pyAbstracts import TypedList, ComparableMixin
 
 #sepRE = re.compile(os.sep)
 digitRE = re.compile('\d+')
