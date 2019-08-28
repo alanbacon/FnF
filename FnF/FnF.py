@@ -3,13 +3,13 @@
 import os
 import sys
 import stat
-import StringHandler
+import StringQuartet
 import re
 
 
 ## Filenames class (and the PathStr class)
 
-from Abstracts import TypedList, ComparableMixin
+from pyAbstracts import TypedList, ComparableMixin
 
 #sepRE = re.compile(os.sep)
 digitRE = re.compile('\d+')
@@ -23,7 +23,7 @@ class PathStr(ComparableMixin, str):
             # convert to lowercase (don't want to sort on case)
             self.raw = args[0].lower()
             # create a StripRegex object that will be able to strip out any digits from a string
-            self.__StripRE = StringHandler.StripRegex(digitRE)
+            self.__StripRE = StringQuartet.StripRegex(digitRE)
             # use StripRegex obj to give a string with the numbers removed
             # a list of the numbers (in the order they appear) and there positions
             self.__StripRE.Strip(self.raw)
@@ -753,7 +753,7 @@ if __name__ == '__main__':
     # F = Filenames(F)
     # F.sort()
     
-    loc = r'/Users/alanb/Desktop/'
-    P = listfilesext(loc, rec=False)
+    loc = r'/Users/alanb/'
+    P = listfilesext(loc, rec=False, system=True)
     P.sort()
     print(P)

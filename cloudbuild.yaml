@@ -1,0 +1,2 @@
+steps:
+  - name: 'eu.gcr.io/pythonbuilds/run_python_tests'
