@@ -3,7 +3,7 @@
 import os
 import sys
 import stat
-import StringHandler
+import StringQuartet
 import re
 
 
@@ -23,7 +23,7 @@ class PathStr(ComparableMixin, str):
             # convert to lowercase (don't want to sort on case)
             self.raw = args[0].lower()
             # create a StripRegex object that will be able to strip out any digits from a string
-            self.__StripRE = StringHandler.StripRegex(digitRE)
+            self.__StripRE = StringQuartet.StripRegex(digitRE)
             # use StripRegex obj to give a string with the numbers removed
             # a list of the numbers (in the order they appear) and there positions
             self.__StripRE.Strip(self.raw)
