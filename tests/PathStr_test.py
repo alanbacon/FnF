@@ -270,5 +270,20 @@ class TestPathStr(unittest.TestCase):
         self.assertFalse(ps1 < ps2)
         self.assertFalse(ps2 < ps1)
 
+    def test_lt_7(self):
+        ps1 = PathStr('filename.f')
+        ps2 = PathStr('filename (1).f')
+        self.assertLess(ps1, ps2)
+
+    def test_lt_8(self):
+        ps1 = PathStr('/path/')
+        ps2 = PathStr('/path/to/')
+        self.assertLess(ps1, ps2)
+
+    def test_lt_9(self):
+        ps1 = PathStr('/path/to/')
+        ps2 = PathStr('/path/')
+        self.assertLess(ps2, ps1)
+
 if __name__ == '__main__':
     unittest.main()

@@ -276,17 +276,25 @@ class PathStr(ComparableMixin, str):
             # a list of the numbers (in the order they appear) and there positions
             self.__StripRE.Strip(self.raw)
             
-            # expose the few attributes of the StripRegex class that we need for the __lt__ routine
-            self.Stripped = self.__StripRE.StrippedString
-            self.groups = self.__StripRE.groups
-            self.NumGroups = self.__StripRE.NumGroups
-            self.InsertLocations = self.__StripRE.InsertLocations
+            self.parts = []
+            for i, g in enumerate(self.__StripRE.allGroups):
+                if i%2 == 0:
+                    self.parts.append(g)
+                else:
+                    self.parts.append(int(g))
 
     def __preplt__(self):
-        self.__StrippedParts = []
-        self.__StrippedParts.append(PathStr.StrippedStr(self.__path))
-        self.__StrippedParts.append(PathStr.StrippedStr(self.__filename))
-        self.__StrippedParts.append(PathStr.StrippedStr(self.__ext))
+        self.__StrippedFolders = []
+
+        path = PathStr(self.path)
+        filename = self.filename
+        ext = self.ext
+        pathAsList = path.getPathAsList()
+        for f in pathAsList:
+            self.__StrippedFolders.append(PathStr.StrippedStr(f))
+        self.__StrippedFolders.append(PathStr.StrippedStr(filename))
+        self.__StrippedFolders.append(PathStr.StrippedStr(ext))
+
         self._lessThanPrepped = True
 
     # make iterable containers (Lists,Tuples,Filename Class) of PathStr sortable:
@@ -303,48 +311,36 @@ class PathStr(ComparableMixin, str):
         if not other._lessThanPrepped:
             other.__preplt__()
 
-        # self_ and other_ are a list of length 3 of type StrippedStr
-        # the path, the filename and the extension
-        self_ = self.__StrippedParts
-        other_ = other.__StrippedParts
+        self_ = self.__StrippedFolders
+        other_ = other.__StrippedFolders
 
-        for i in range(3):
-            S = self_[i]
-            O = other_[i]
-            if S.raw == O.raw:
-                # if this part of the full filename is the same they should be sorted
-                # on a more specific part of their filename
-                continue
-            elif S.Stripped == O.Stripped:
-                # this part of the filename is only the same when the numbers have been stripped out
-                for i, NumStr in enumerate(S.groups):
-                    if i < O.NumGroups:
-                        if S.InsertLocations[i] == O.InsertLocations[i]:
-                            # self and other have numerics appearing in the same place
-                            sNum = float(NumStr)
-                            oNum = float(O.groups[i])
-                            if sNum == oNum:
-                                # have found the same number appearing at the same point
-                                # can't make any conclusions on this
-                                continue
-                            else:
-                                # have found two different numbers that occur at the same point
-                                return sNum < oNum
-                        else:
-                            # self and other have numerics appearing in different places
-                            # the string where the number appears first is the lesser string
-                            return S.InsertLocations[i] < O.InsertLocations[i]
-                    else:
-                        # other is a longer string, and all numbers have been equal
-                        return True
+        for i, S_folder in enumerate(self_):
+            if i >= len(other_):
+                # other string has more folder depth
+                return True
 
-            # BUG------------------------------BUG---------------------BUG--------------------BUG-------------------BUG------------------------------
-            #### just because this part of the filename isn't the same can't compare them as we don't know where the numbers have been stripped from
-            #### use 'wallpaper-266390[1]' and 'wallpaper-2656946' as examples
-            else:
-                # this part of the filename is not the same
-                # can sort using the raw strings:
-                return S.raw < O.raw
+            O_folder = other_[i]
+            for j, S_part in enumerate(S_folder.parts):
+                if j >= len(O_folder.parts):
+                    # other folder has longer name
+                    return True
+
+                O_part = O_folder.parts[j]
+                if S_part == O_part:
+                    # if this part of the foldername is the same they should be sorted
+                    # on a more specific part of their foldername
+                    continue
+                elif S_part < O_part:
+                    return True
+                elif O_part < S_part:
+                    return False
+                else:
+                    raise RuntimeError('unknown __lt__ algorithm failure')
+
+
+        if len(other_) < len(self_):
+            # self has more folder depth
+            return False
         
         # the stripped strings were the same and the numbers contains in the unstripped string 
         # mathematically evaluate to be equivalent (they must contain padding zeros)

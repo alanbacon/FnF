@@ -1,7 +1,6 @@
 __pycache__
+.idea
 build
 dist
 *.egg-info
-bin
-lib
-include
+venv
