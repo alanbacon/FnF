@@ -1,2 +1,2 @@
 pyAbstracts==1.0.3
-StringQuartet==1.0.0
+StringQuartet==1.1.0
